@@ -1,27 +1,26 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
 import { map } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NewsapiservicesService {
-
-
   private apiKey = 'f4d3b879333e4424a1b9511a62c36b0f'; // Replace with your own API key
+  private netlifyFunctionUrl = '/.netlify/functions/getNews';
 
-  constructor(private _http:HttpClient) { }
+  constructor(private _http: HttpClient) {}
 
-  newsApiUrl = "https://newsapi.org/v2/everything?q=Allsvenskan&domains=expressen.se,aftonbladet.se&from=2023-05-26&sortBy=publishedAt&apiKey=f4d3b879333e4424a1b9511a62c36b0f"
+  newsApiUrl =
+    'https://newsapi.org/v2/everything?q=Allsvenskan&domains=expressen.se,aftonbladet.se&from=2023-05-26&sortBy=publishedAt&apiKey=f4d3b879333e4424a1b9511a62c36b0f';
 
-  topHeading():Observable<any>
-  {
+  topHeading(): Observable<any> {
     return this._http.get(this.newsApiUrl);
   }
 
   getNewsByQuery(query: string): Observable<any> {
-
     this.getNewsByQuerys('IFK Göteborg').subscribe((articles: any[]) => {
       if (articles.length > 0) {
         const firstArticleUrl = articles[0].link;
@@ -36,10 +35,7 @@ export class NewsapiservicesService {
 
     const fromDateString = formatDate(oneMonthAgo);
 
-    const domains = ['aftonbladet.se', 'svenskafans.com', 'fotbollskanalen.se', 'expressen.se'];
-    const domainQuery = domains.join(',');
-
-    const apiUrl = `https://newsapi.org/v2/everything?q=${query}&from=${fromDateString}&sortBy=publishedAt&language=sv&domains=${domainQuery}&excludeDomains=feber.se&apiKey=${this.apiKey}`;
+    const apiUrl = `${this.netlifyFunctionUrl}?query=${encodeURIComponent(query)}&from=${fromDateString}`;
     return this._http.get(apiUrl).pipe(
       map((response: any) => {
         const articles = response.articles.filter((article: any) => article.author !== null);
@@ -50,14 +46,14 @@ export class NewsapiservicesService {
   }
 
   getNewsByQuerys(query: string): Observable<any> {
-    const googleNewsUrl = `https://news.google.com/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US%3Aen`;
+    const googleNewsUrl = `${this.netlifyFunctionUrl}?query=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US%3Aen`;
 
     return this._http.get(googleNewsUrl, { responseType: 'text' }).pipe(
       map((response: any) => {
         const parser = new DOMParser();
         const xml = parser.parseFromString(response, 'text/xml');
         const items = xml.querySelectorAll('item');
-        const articles: { title: any; link: any; description: any; pubDate: any; }[] = [];
+        const articles: { title: any; link: any; description: any; pubDate: any }[] = [];
 
         items.forEach((item: any) => {
           const titleElement = item.querySelector('title');
