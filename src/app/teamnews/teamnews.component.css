@@ -1,0 +1,11 @@
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.image-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}

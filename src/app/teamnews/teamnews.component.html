@@ -1,0 +1,20 @@
+<div class="container-fluid" [ngStyle]="backgroundStyle">
+  <div class="row">
+    <div class="image-container">
+      <img [src]="teamLogo" width="10%">
+    </div>
+  </div>
+
+  <div class="row">
+    <div *ngFor="let d of topheadingDisplay" class="col-lg-4 mt-3 mb-3">
+      <div class="box">
+        <h6 class="mt-2 mb-2 source-name">{{d.sourceName}}</h6>
+        <h6 class="mt-2 mb-2 source-name">{{d.publishedAt}}</h6>
+        <a href="{{d.url}}">
+          <img src="{{d.urlToImage}}" width="100%">
+          <h5 class="mt-2 mb-2">{{d.title}}</h5>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
